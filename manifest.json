@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Auto NanoRefresh",
+  "name": "Auto Refresh Nano",
   "version": "1.3",
   "description": "A lightweight autorefresher and page monitor.",
   "permissions": [
