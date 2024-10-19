@@ -1,17 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const startButton = document.getElementById('startButton');
-  const stopButton = document.getElementById('stopButton');
   const intervalInput = document.getElementById('interval');
-  const stopPromptInput = document.getElementById('stopPrompt');
+  const toggleButton = document.getElementById('toggleButton');
+  const stopPromptInput = document.getElementById('monitorPrompt');
   const alertToggle = document.getElementById('alertToggle');
   const statusDiv = document.getElementById('status');
   const themeToggle = document.getElementById('themeToggle');
   const randomToggle = document.getElementById('randomToggle');
+  const monitorModeSelect = document.getElementById('monitorMode');
 
-
-  // Load the saved theme setting from chrome.storage when the popup is opened
-  chrome.storage.sync.get(['theme', 'interval', 'randomize'], (data) => {
-    // Set theme based on saved value
+  // Load saved settings
+  chrome.storage.sync.get(['theme', 'interval', 'randomize', 'alertEnabled'], (data) => {
+    // Set theme
     if (data.theme === 'light') {
       document.body.classList.remove('dark-mode');
       themeToggle.checked = false;
@@ -20,15 +19,26 @@ document.addEventListener('DOMContentLoaded', () => {
       themeToggle.checked = true;
     }
 
-    // Set interval input based on saved value (fallback to 1 second if not set)
+    // Set initial button state
+    if (data.isRunning) {
+      setButtonToStop();
+      updateStatus(true);
+    } else {
+      setButtonToStart();
+      updateStatus(false);
+    }
+
+    // Set interval input
     intervalInput.value = data.interval ? data.interval : 1;
 
-
-    // Set random toggle based on saved value (default is false)
+    // Set random toggle
     randomToggle.checked = data.randomize ? data.randomize : false;
+
+    // Set alert toggle
+    alertToggle.checked = data.alertEnabled ? data.alertEnabled : false;
   });
 
-  // Toggle theme and save the setting when the switch is clicked
+  // Theme toggle event listener
   themeToggle.addEventListener('change', () => {
     if (themeToggle.checked) {
       document.body.classList.add('dark-mode');
@@ -39,19 +49,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Update status text
+  // Alert toggle event listener
+  alertToggle.addEventListener('change', () => {
+    chrome.storage.sync.set({ alertEnabled: alertToggle.checked });
+  });
+
+  // Update status function
   function updateStatus(isRunning) {
     statusDiv.textContent = isRunning ? 'Auto-refresh is running' : 'Auto-refresh is stopped';
   }
 
-  // Function to set button to "Start"
+  // Set button to Start
   function setButtonToStart() {
     toggleButton.textContent = 'Start Auto Refresh';
     toggleButton.classList.remove('stop');
     toggleButton.classList.add('start');
   }
 
-  // Function to set button to "Stop"
+  // Set button to Stop
   function setButtonToStop() {
     toggleButton.textContent = 'Stop Auto Refresh';
     toggleButton.classList.remove('start');
@@ -61,9 +76,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // Get current auto-refresh status on load
   chrome.runtime.sendMessage({ action: 'getStatus' }, (response) => {
     updateStatus(response.isRunning);
+    if (response.isRunning) {
+      setButtonToStop();
+    } else {
+      setButtonToStart();
+    }
   });
 
-  // Handle click to toggle start/stop
+  // Toggle button event listener
   toggleButton.addEventListener('click', () => {
     if (toggleButton.classList.contains('start')) {
       // Start auto-refresh
@@ -78,40 +98,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const stopPrompt = stopPromptInput.value;
       const showAlert = alertToggle.checked;
+      const monitorMode = monitorModeSelect.value;
 
-      // Save interval value and randomize state to chrome.storage.sync
+      // Save settings
       chrome.storage.sync.set({
         interval: intervalInput.value,
         randomize: randomToggle.checked,
-        isRunning: true
+        isRunning: true,
+        stopPrompt: stopPrompt,
+        monitorMode: monitorMode
       });
 
-      chrome.runtime.sendMessage({ action: 'start', interval: finalInterval, stopPrompt, showAlert }, (response) => {
+      chrome.runtime.sendMessage({ action: 'start', interval: finalInterval, stopPrompt, showAlert, monitorMode }, (response) => {
         if (response.status === 'running') {
           setButtonToStop();
           updateStatus(true);
         }
       });
     } else {
-      // Stop auto-refresh
-      chrome.runtime.sendMessage({ action: 'stop' }, (response) => {
-        if (response.status === 'stopped') {
-          setButtonToStart();
-          updateStatus(false);
-          chrome.storage.sync.set({ isRunning: false });
-        }
+      chrome.storage.sync.get(['stopPrompt', 'monitorMode'], (data) => {
+        chrome.runtime.sendMessage({ action: 'stop', stopPrompt: data.stopPrompt, monitorMode: data.monitorMode }, (response) => {
+          if (response.status === 'stopped') {
+            setButtonToStart();
+            updateStatus(false);
+            chrome.storage.sync.set({ isRunning: false });
+          }
+        });
       });
     }
   });
 
-  // Toggle theme and save the setting when the switch is clicked
-  themeToggle.addEventListener('change', () => {
-    if (themeToggle.checked) {
-      document.body.classList.add('dark-mode');
-      chrome.storage.sync.set({ theme: 'dark' });
-    } else {
-      document.body.classList.remove('dark-mode');
-      chrome.storage.sync.set({ theme: 'light' });
+  // Listen for messages from the background script
+  chrome.runtime.onMessage.addListener((message) => {
+    if (message.action === 'autoRefreshStopped') {
+      setButtonToStart();
+      updateStatus(false);
+      chrome.storage.sync.set({ isRunning: false });
+
+      if (message.autoStopped) {
+        statusDiv.textContent = 'Auto-refresh automatically stopped';
+      }
     }
   });
 });

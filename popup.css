@@ -7,17 +7,18 @@
 body {
   font-family: 'Roboto', sans-serif;
   margin: 0;
-  padding: 2rem;
-  max-width: 100%;  /* Ensure content fits within the window */
+  padding: 1.5rem;  /* Reduced padding to avoid scrolling */
+  max-width: 100%;
   width: 20rem;
   box-sizing: border-box;
   background-color: var(--background-color);
   color: var(--text-color);
+  overflow-y: auto;  /* Prevent content overflow */
 }
 
 h2 {
   font-size: 1.5rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 label {
@@ -27,7 +28,7 @@ label {
 
 input[type="number"], input[type="text"] {
   width: 100%;
-  padding: 0.8rem;
+  padding: 0.7rem;
   margin-bottom: 1rem;
   border: 1px solid var(--input-border);
   border-radius: 0.5rem;
@@ -37,40 +38,30 @@ input[type="number"], input[type="text"] {
   box-sizing: border-box;
 }
 
-input[type="checkbox"] {
-  margin-right: 0.5rem;
-}
-
 button#toggleButton {
   display: block;
   width: 100%;
-  padding: 0.8rem;
+  padding: 0.7rem;
   font-size: 1rem;
   border: none;
   border-radius: 0.5rem;
   cursor: pointer;
-  background-color: #4CAF50; /* Green background */
+  background-color: #4CAF50;
   color: white;
   margin: 1.5rem 0;
 }
 
 button#toggleButton.stop {
-  background-color: #f44336; /* Red background */
+  background-color: #f44336;
+}
+
+#interval, #stopPrompt {
+  margin-top: 0.5rem;
 }
 
 #status {
   font-size: 1rem;
   margin-top: 1rem;
-}
-
-.checkbox-container {
-  display: flex;
-  align-items: center;
-  margin-bottom: 1.5rem;
-}
-
-.checkbox-container label {
-  margin: 0;
 }
 
 .toggle-container {
@@ -82,9 +73,52 @@ button#toggleButton.stop {
   padding-bottom: 0.5rem;
 }
 
-.toggle-container span {
-  vertical-align: middle;
+.inline-sentence {
+  display: block;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
 
+.inline-sentence span,
+.inline-sentence select {
+  display: inline;
+  vertical-align: middle;
+}
+
+select#monitorMode {
+  border: 1px solid var(--input-border);
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  background-color: var(--input-background);
+  color: var(--input-text);
+  box-sizing: border-box;
+  appearance: none;
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0iZmVhdGhlciBmZWF0aGVyLWNoZXZyb24tZG93biI+PHBvbHlsaW5lIHBvaW50cz0iNiA5IDEyIDE1IDE4IDkiLz48L3N2Zz4=');
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  padding-right: 2.5rem;
+  width: 50%;
+}
+
+select#monitorMode:focus {
+  outline: none;
+  border-color: #4CAF50;
+}
+
+/* Dark Mode Handling */
+body.dark-mode {
+  background-color: #121212;
+  color: #e0e0e0;
+  --input-border: #333;
+  --input-background: #333;
+  --input-text: #fff;
+}
+
+body.dark-mode select#monitorMode {
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgY2xhc3M9ImZlYXRoZXIgZmVhdGhlci1jaGV2cm9uLWRvd24iPjxwb2x5bGluZSBwb2ludHM9IjYgOSAxMiAxNSAxOCA5Ii8+PC9zdmc+');
+  background-color: #333;
+  color: #fff;
 }
 
 /* Light Mode Colors */
@@ -96,18 +130,8 @@ button#toggleButton.stop {
   --input-text: #000;
 }
 
-/* Dark Mode Colors */
-body.dark-mode {
-  --background-color: #121212;
-  --text-color: #e0e0e0;
-  --input-border: #333;
-  --input-background: #333;
-  --input-text: #fff;
-}
-
 /* Toggle Switch Styling */
 .switch {
-  vertical-align: middle;
   position: relative;
   display: inline-block;
   width: 2.5rem;
@@ -175,6 +199,7 @@ input:checked + .slider:before {
   visibility: visible;
 }
 
+/* Adjustments for small screens */
 @media (max-width: 400px) {
   body {
     padding: 1rem;
@@ -185,21 +210,12 @@ input:checked + .slider:before {
     padding: 0.75rem;
   }
 
+  select#monitorMode {
+    font-size: 1rem;
+    padding: 0.75rem;
+  }
+
   h2 {
     font-size: 1.25rem;
-  }
-
-  .switch {
-    width: 2rem;
-    height: 1rem;
-  }
-
-  .slider:before {
-    height: 0.75rem;
-    width: 0.75rem;
-  }
-
-  input:checked + .slider:before {
-    transform: translateX(1rem);
   }
 }

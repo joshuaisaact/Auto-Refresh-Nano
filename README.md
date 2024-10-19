@@ -1,5 +1,5 @@
 
-# Auto Refresher Chrome Extension
+# Auto Refresh Nano
 
 This Chrome extension allows you to automatically refresh a webpage and stop refreshing when a specific word or phrase is found on the page.
 
@@ -11,7 +11,7 @@ This Chrome extension allows you to automatically refresh a webpage and stop ref
 - 1.2 - Interval value now saved between sessions (you'll need to run at least one auto-refresh to save it). Added a 'randomness' toggle that randomises the refresh interval by up to 10%.
 - 1.1 - Updated with alert, dark mode, background refresh
 - 1.0 - Refresher release
-  
+
 ## Installation Guide
 
 Follow these simple steps to install the extension from GitHub onto your Chrome browser.
