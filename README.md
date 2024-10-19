@@ -10,7 +10,7 @@ This Chrome extension allows you to automatically refresh a webpage and stop ref
 
 ## Features
 - Automatically refresh a webpage at set intervals (e.g., every 30 seconds).
-- Optionally stop the auto-refresh when a specific word or phrase appears on the page.
+- Optionally stop the auto-refresh when a specific word or phrase appears or disappears from the tab.
 
 ## Versions
 - 1.2 - Interval value now saved between sessions (you'll need to run at least one auto-refresh to save it). Added a 'randomness' toggle that randomises the refresh interval by up to 10%.
