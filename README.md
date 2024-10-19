@@ -1,5 +1,5 @@
 
-# Auto Refresher Chrome Extension
+# Auto Refresh Nano
 
 ![GitHub manifest version](https://img.shields.io/github/manifest-json/v/joshuaisaact/Auto-refresher)
 ![GitHub License](https://img.shields.io/github/license/joshuaisaact/Auto-refresher)
@@ -16,7 +16,7 @@ This Chrome extension allows you to automatically refresh a webpage and stop ref
 - 1.2 - Interval value now saved between sessions (you'll need to run at least one auto-refresh to save it). Added a 'randomness' toggle that randomises the refresh interval by up to 10%.
 - 1.1 - Updated with alert, dark mode, background refresh
 - 1.0 - Refresher release
-  
+
 ## Installation Guide
 
 Please note: this extension is now live on the Chrome web store, and can easily be installed at this link:

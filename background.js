@@ -2,28 +2,28 @@ let isRunning = false;
 let intervalId = null;
 let stopPrompt = '';
 let showAlert = false;
-let currentTabId = null;  // Store the tabId of the current tab
+let monitorMode = 'presence';
+let currentTabId = null;
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'start') {
     if (!isRunning) {
-      const { interval, stopPrompt: promptText, showAlert: alertEnabled } = message; // Changed to 'interval'
+      const { interval, stopPrompt: promptText, showAlert: alertEnabled, monitorMode: newMonitorMode } = message;
       stopPrompt = promptText;
       showAlert = alertEnabled;
+      monitorMode = newMonitorMode || 'presence';
 
-      // Get the current active tab and store its tabId
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (tabs.length > 0) {
-          currentTabId = tabs[0].id; // Store the ID of the current tab
+          currentTabId = tabs[0].id;
 
           intervalId = setInterval(() => {
-            // Refresh the stored tab, even if it's not active
             chrome.scripting.executeScript({
               target: { tabId: currentTabId },
               func: refreshTab,
-              args: [stopPrompt],
+              args: [stopPrompt, monitorMode],
             });
-          }, interval); // Use 'interval'
+          }, interval);
 
           isRunning = true;
           sendResponse({ status: 'running' });
@@ -31,53 +31,49 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       });
     }
   } else if (message.action === 'stop') {
-    clearInterval(intervalId);
-    isRunning = false;
-
-    if (showAlert) {
-      // Show a desktop notification
-      chrome.notifications.create({
-        type: 'basic',
-        iconUrl: 'icon.png',
-        title: 'Auto-refresh Stopped',
-        message: 'The auto-refresh has stopped for the tab.',
-        priority: 2
-      });
-
-      // Play a sound alert
-      chrome.scripting.executeScript({
-        target: { tabId: currentTabId },
-        func: playSoundAlert,
-      });
-    }
-
+    stopAutoRefresh(true, message.stopPrompt, message.monitorMode);
     sendResponse({ status: 'stopped' });
   } else if (message.action === 'getStatus') {
     sendResponse({ isRunning });
   }
 
-  return true; // Required for asynchronous response
+  return true;
 });
 
-// Function to be injected and executed in the current page
-function refreshTab(prompt) {
+// Refactored stop function
+function stopAutoRefresh(autoStopped = true) {
+  clearInterval(intervalId);
+  isRunning = false;
+
+  if (showAlert) {
+    // Determine the action (appeared/disappeared)
+    let actionMessage = monitorMode === 'presence' ? 'appeared' : 'disappeared';
+
+    // Create the notification with more context
+    chrome.notifications.create({
+      type: 'basic',
+      iconUrl: 'icon.png',
+      title: '🔔 Auto-refresh Stopped! 🔔',
+      message: 'The auto-refresh has been stopped. Please take action now.',
+      priority: 2
+    });
+
+  }
+
+  chrome.runtime.sendMessage({ action: 'autoRefreshStopped', autoStopped });
+}
+
+function refreshTab(prompt, monitorMode) {
   if (prompt && prompt.trim().length > 0) {
-    // Check if the stop word is found on the page
-    if (document.body.innerText.includes(prompt)) {
-      // If found, stop the auto-refresh by sending a message to the background script
+    const pageText = document.body.innerText;
+    const wordExists = pageText.includes(prompt);
+
+    if ((monitorMode === 'presence' && wordExists) || (monitorMode === 'absence' && !wordExists)) {
       chrome.runtime.sendMessage({ action: 'stop' });
     } else {
-      // If not found, refresh the page
       window.location.reload();
     }
   } else {
-    // If no stop word is provided, just refresh the page
     window.location.reload();
   }
-}
-
-// Function to play a sound when refreshing stops
-function playSoundAlert() {
-  const audio = new Audio('https://www.myinstants.com/media/sounds/bell.mp3'); // You can provide any URL or use your own sound file
-  audio.play();
 }
