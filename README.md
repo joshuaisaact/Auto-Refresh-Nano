@@ -1,12 +1,16 @@
+<div align="center">
 
-# Auto Refresh Nano
+![Auto Refresh Nano](resources/autorefreshnano.png)
+
+<h2>Monitor websites for changes in Chrome</h2>
 
 ![GitHub manifest version](https://img.shields.io/github/manifest-json/v/joshuaisaact/Auto-refresher)
 ![GitHub License](https://img.shields.io/github/license/joshuaisaact/Auto-refresher)
 ![Chrome Web Store Users](https://img.shields.io/chrome-web-store/users/haiekoimldaeincnjchccogfbejgbmej)
 ![Chrome Web Store Rating](https://img.shields.io/chrome-web-store/rating/haiekoimldaeincnjchccogfbejgbmej)
+</div>
 
-This Chrome extension allows you to automatically refresh a webpage and stop refreshing when a specific word or phrase is found on the page.
+Automatically refresh a webpage and stop refreshing when something changes.
 
 ## Features
 - Automatically refresh a webpage at set intervals (e.g., every 30 seconds).
