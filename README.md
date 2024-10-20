@@ -2,7 +2,7 @@
 
 ![Auto Refresh Nano](resources/autorefreshnano.png)
 
-<h2>Monitor websites for changes in Chrome</h2>
+<h2>Auto-Refresh pages & detect changes instantly</h2>
 
 ![GitHub manifest version](https://img.shields.io/github/manifest-json/v/joshuaisaact/Auto-refresher)
 ![GitHub License](https://img.shields.io/github/license/joshuaisaact/Auto-refresher)
