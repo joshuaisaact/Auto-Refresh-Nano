@@ -12,6 +12,8 @@
 
 Automatically refresh a webpage and stop refreshing when something changes.
 
+![Features Screenshot](resources/features1.png)
+
 ## Features
 - Automatically refresh a webpage at set intervals (e.g., every 30 seconds).
 - Optionally stop the auto-refresh when a specific word or phrase appears or disappears from the tab.
